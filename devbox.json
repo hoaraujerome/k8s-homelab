@@ -4,7 +4,8 @@
     "terraform@1.10.4",
     "pre-commit@4.0.1",
     "git@2.47.1",
-    "awscli2@2.19.0"
+    "awscli2@2.19.0",
+    "jq@1.7.1"
   ],
   "shell": {
     "init_hook": [

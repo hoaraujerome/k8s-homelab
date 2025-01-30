@@ -119,15 +119,44 @@ create_iam_policy() {
   fi
 }
 
+attach_iam_user_to_policy() {
+  local output
+  output=$(
+    aws iam list-policies \
+      --query "Policies[?PolicyName=='${TERRAFORM_SERVICE_ACCOUNT_NAME}'].Arn" \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  local exit_code=$?
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  local policy_arn=$(
+    echo ${output} | jq -r '.[0]'
+  )
+  echo "${policy_arn}"
+
+  output=$(
+    aws iam attach-user-policy \
+      --policy-arn "${policy_arn}" \
+      --user-name "${TERRAFORM_SERVICE_ACCOUNT_NAME}" \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+  if [ ${exit_code} -eq 0 ]; then
+    echo "IAM user attached to policy successfully"
+  else
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+}
+
 create_terraform_service_account() {
   echo "Create Terraform Service Account"
-
   create_iam_user
   create_iam_policy
-  # output=$(run_aws_command "iam" "list-policies" "--query" "Policies[?PolicyName=='${policy_name}'].Arn" "--output" "json")
-  # policy_arn=$(echo "$output" | sed -n 's/.*"\(arn:aws:iam:[^"]*\)".*/\1/p')
-
-  # run_aws_command "iam" "attach-user-policy" "--policy-arn" "${policy_arn}" "--user-name" "${TERRAFORM_SERVICE_ACCOUNT_NAME}"
+  attach_iam_user_to_policy
 }
 
 main() {
