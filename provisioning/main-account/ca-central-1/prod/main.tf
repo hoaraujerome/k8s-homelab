@@ -1,3 +1,3 @@
 output "foo" {
-  value = "hello"
+  value = "hello!!"
 }

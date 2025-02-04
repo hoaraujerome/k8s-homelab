@@ -1,8 +1,16 @@
 SHELL := /usr/bin/env bash
 
 # Define targets
-.PHONY: prereq
+.PHONY: prereq plan deploy destroy
 
 prereq:
-	@echo "Setting up prerequisites..."
 	./prereq/bootstrap.sh
+
+plan:
+	./provisioning/provision.sh plan
+
+deploy:
+	./provisioning/provision.sh deploy
+
+destroy:
+	./provisioning/provision.sh destroy
