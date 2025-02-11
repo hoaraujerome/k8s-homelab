@@ -10,6 +10,25 @@
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
       "Resource": "arn:aws:s3:::hoaraujerome-k8s-homelab/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:ImportKeyPair",
+        "ec2:DescribeKeyPairs",
+        "ec2:DeleteKeyPair",
+        "ec2:CreateVpc",
+        "ec2:CreateTags",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DeleteVpc",
+        "ec2:ModifyVpcAttribute",
+        "ec2:CreateSubnet",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteSubnet"
+      ],
+      "Resource": "*"
     }
   ]
 }

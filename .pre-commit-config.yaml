@@ -13,11 +13,3 @@ repos:
     rev: v8.20.1
     hooks:
       - id: gitleaks
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.97.3
-    hooks:
-      - id: terraform_fmt
-      # https://github.com/antonbabenko/pre-commit-terraform?tab=readme-ov-file#terraform_validate
-      - id: terraform_validate
-        args:
-          - --tf-init-args=-backend=false

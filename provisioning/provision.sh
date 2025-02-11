@@ -3,6 +3,7 @@
 set -e
 
 AWS_PROFILE="k8s_homelab"
+MODULES_PATH="./provisioning/modules"
 ROOT_MODULE_PATH="./provisioning/main-account/ca-central-1/prod"
 TFPLAN_FILENAME="tfplan"
 
@@ -18,16 +19,36 @@ print_usage() {
 
 check_terraform_files() {
   log_message "Check Terraform files"
+  terraform fmt -check -diff -recursive
+}
 
-  pre-commit run terraform_fmt --all-files
-  pre-commit run terraform_validate --all-files
+test_modules() {
+  log_message "Test modules"
+
+  for dir in ./provisioning/modules/*/; do
+    log_message "... module: ${dir}"
+    pushd "${dir}"
+    terraform init -backend=false
+    terraform validate
+    terraform test
+    popd
+  done
+}
+
+setup_terraform_vars() {
+  export TF_VAR_ssh_public_key_path="${HOME}/.ssh/id_rsa_k8s_homelab.pub"
 }
 
 run_terraform_plan() {
   log_message "Run Terraform plan"
 
-  terraform -chdir="${ROOT_MODULE_PATH}" init
-  terraform -chdir="${ROOT_MODULE_PATH}" plan -out="${TFPLAN_FILENAME}"
+  pushd "${ROOT_MODULE_PATH}"
+  terraform init -backend=false
+  terraform validate
+  setup_terraform_vars
+  terraform init
+  terraform plan -out="${TFPLAN_FILENAME}"
+  popd
 }
 
 run_security_scanner() {
@@ -43,6 +64,11 @@ plan_infra_provisioning() {
   log_message "Plan infrastructure provisioning"
 
   check_terraform_files
+
+  if [ -z "${SKIP_TESTS}" ]; then
+    test_modules
+  fi
+
   run_terraform_plan
   run_security_scanner
 }
