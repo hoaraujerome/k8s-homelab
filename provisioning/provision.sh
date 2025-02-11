@@ -4,6 +4,7 @@ set -e
 
 AWS_PROFILE="k8s_homelab"
 ROOT_MODULE_PATH="./provisioning/main-account/ca-central-1/prod"
+TFPLAN_FILENAME="tfplan"
 
 log_message() {
   local message="${1}"
@@ -16,34 +17,59 @@ print_usage() {
 }
 
 check_terraform_files() {
+  log_message "Check Terraform files"
+
   pre-commit run terraform_fmt --all-files
   pre-commit run terraform_validate --all-files
 }
 
-plan() {
+run_terraform_plan() {
+  log_message "Run Terraform plan"
+
+  terraform -chdir="${ROOT_MODULE_PATH}" init
+  terraform -chdir="${ROOT_MODULE_PATH}" plan -out="${TFPLAN_FILENAME}"
+}
+
+run_security_scanner() {
+  log_message "Run security scanner"
+
+  trivy fs \
+    --scanners secret,misconfig \
+    --exit-code 1 \
+    "${PROVISIONING_PATH}"
+}
+
+plan_infra_provisioning() {
   log_message "Plan infrastructure provisioning"
-  check_terraform_files
 
-  terraform -chdir="${ROOT_MODULE_PATH}" init
-  terraform -chdir="${ROOT_MODULE_PATH}" plan
+  check_terraform_files
+  run_terraform_plan
+  run_security_scanner
 }
 
-deploy() {
+run_terraform_apply() {
+  log_message "Run Terraform apply"
+
+  terraform -chdir="${ROOT_MODULE_PATH}" apply "${TFPLAN_FILENAME}"
+}
+
+deploy_infra() {
   log_message "Deploy infrastructure"
-  check_terraform_files
-  local tfplan_filename="tfplan"
 
-  terraform -chdir="${ROOT_MODULE_PATH}" init
-  terraform -chdir="${ROOT_MODULE_PATH}" plan -out="${tfplan_filename}"
-  terraform -chdir="${ROOT_MODULE_PATH}" apply "${tfplan_filename}"
+  plan_infra_provisioning
+  run_terraform_apply
 }
 
-destroy() {
+destroy_infra() {
   log_message "Destroy infrastructure"
-  check_terraform_files
 
+  check_terraform_files
   terraform -chdir="${ROOT_MODULE_PATH}" init
   terraform -chdir="${ROOT_MODULE_PATH}" destroy
+}
+
+setup_environment() {
+  export AWS_PROFILE="${AWS_PROFILE}"
 }
 
 main() {
@@ -52,17 +78,17 @@ main() {
     print_usage
   fi
 
-  export AWS_PROFILE="${AWS_PROFILE}"
+  setup_environment
 
   case "${argument}" in
   plan)
-    plan
+    plan_infra_provisioning
     ;;
   deploy)
-    deploy
+    deploy_infra
     ;;
   destroy)
-    destroy
+    destroy_infra
     ;;
   *)
     echo "$(basename ${0}) - invalid argument: ${argument}" >&2

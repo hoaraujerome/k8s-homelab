@@ -364,6 +364,54 @@
           "store_path": "/nix/store/8wc5zvj59rpr7gsvrwdfdi7nkrpsybn4-terraform-1.10.4"
         }
       }
+    },
+    "trivy@0.58.0": {
+      "last_modified": "2024-12-23T21:10:33Z",
+      "resolved": "github:NixOS/nixpkgs/de1864217bfa9b5845f465e771e0ecb48b30e02d#trivy",
+      "source": "devbox-search",
+      "version": "0.58.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/490pgng37swpbyspf3cj7970rg95s7dd-trivy-0.58.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/490pgng37swpbyspf3cj7970rg95s7dd-trivy-0.58.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/7rji8yxv3vwnkc499087v9fip011j8a0-trivy-0.58.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/7rji8yxv3vwnkc499087v9fip011j8a0-trivy-0.58.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/bskc4p2hv8zlnk9hpa2z39i57mw0sbwv-trivy-0.58.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/bskc4p2hv8zlnk9hpa2z39i57mw0sbwv-trivy-0.58.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/h5nxgdvqvavg79ikql35x07scg67a3ay-trivy-0.58.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/h5nxgdvqvavg79ikql35x07scg67a3ay-trivy-0.58.0"
+        }
+      }
     }
   }
 }
