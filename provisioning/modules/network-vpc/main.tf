@@ -21,6 +21,6 @@ resource "aws_subnet" "this" {
   cidr_block = each.value.ipv4_cidr_block
 
   tags = {
-    Name = "${var.tag_prefix}${each.key}-subnet"
+    Name = "${var.tag_prefix}${each.key}"
   }
 }

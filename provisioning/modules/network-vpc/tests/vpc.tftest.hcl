@@ -62,7 +62,7 @@ run "check_vpc_with_one_subnet" {
   }
 
   assert {
-    condition     = aws_subnet.this["bastion"].tags["Name"] == format("%sbastion-subnet", var.tag_prefix)
+    condition     = aws_subnet.this["bastion"].tags["Name"] == format("%sbastion", var.tag_prefix)
     error_message = "Invalid bastion subnet tag name"
   }
 }
@@ -97,7 +97,7 @@ run "check_vpc_with_three_subnets" {
   }
 
   assert {
-    condition     = aws_subnet.this["bastion"].tags["Name"] == format("%sbastion-subnet", var.tag_prefix)
+    condition     = aws_subnet.this["bastion"].tags["Name"] == format("%sbastion", var.tag_prefix)
     error_message = "Invalid bastion subnet tag name"
   }
 
@@ -107,7 +107,7 @@ run "check_vpc_with_three_subnets" {
   }
 
   assert {
-    condition     = aws_subnet.this["transit"].tags["Name"] == format("%stransit-subnet", var.tag_prefix)
+    condition     = aws_subnet.this["transit"].tags["Name"] == format("%stransit", var.tag_prefix)
     error_message = "Invalid transit subnet tag name"
   }
 
@@ -117,7 +117,7 @@ run "check_vpc_with_three_subnets" {
   }
 
   assert {
-    condition     = aws_subnet.this["foo"].tags["Name"] == format("%sfoo-subnet", var.tag_prefix)
+    condition     = aws_subnet.this["foo"].tags["Name"] == format("%sfoo", var.tag_prefix)
     error_message = "Invalid foo subnet tag name"
   }
 }
@@ -164,16 +164,16 @@ run "create_vpc_with_three_subnets" {
   }
 
   assert {
-    condition     = output.subnet_ids_by_name["bastion-subnet"] == aws_subnet.this["bastion"].id
+    condition     = output.subnet_ids_by_name["bastion"] == aws_subnet.this["bastion"].id
     error_message = "Invalid ouput bastion subnet id"
   }
 
   assert {
-    condition     = output.subnet_ids_by_name["transit-subnet"] == aws_subnet.this["transit"].id
+    condition     = output.subnet_ids_by_name["transit"] == aws_subnet.this["transit"].id
     error_message = "Invalid ouput transit subnet id"
   }
   assert {
-    condition     = output.subnet_ids_by_name["foo-subnet"] == aws_subnet.this["foo"].id
+    condition     = output.subnet_ids_by_name["foo"] == aws_subnet.this["foo"].id
     error_message = "Invalid ouput foo subnet id"
   }
 }

@@ -26,7 +26,16 @@
         "ec2:CreateSubnet",
         "ec2:DescribeSubnets",
         "ec2:DescribeNetworkInterfaces",
-        "ec2:DeleteSubnet"
+        "ec2:DeleteSubnet",
+        "ec2:DescribeImages",
+        "ec2:RunInstances",
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceTypes",
+        "ec2:DescribeTags",
+        "ec2:DescribeInstanceAttribute",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeInstanceCreditSpecifications",
+        "ec2:TerminateInstances"
       ],
       "Resource": "*"
     }

@@ -90,6 +90,7 @@ destroy_infra() {
   log_message "Destroy infrastructure"
 
   check_terraform_files
+  setup_terraform_vars
   terraform -chdir="${ROOT_MODULE_PATH}" init
   terraform -chdir="${ROOT_MODULE_PATH}" destroy
 }
