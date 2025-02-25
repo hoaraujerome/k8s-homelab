@@ -14,6 +14,18 @@
     {
       "Effect": "Allow",
       "Action": [
+        "ec2-instance-connect:SendSSHPublicKey"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:osuser": "ubuntu"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "ec2:ImportKeyPair",
         "ec2:DescribeKeyPairs",
         "ec2:DeleteKeyPair",
@@ -35,7 +47,14 @@
         "ec2:DescribeInstanceAttribute",
         "ec2:DescribeVolumes",
         "ec2:DescribeInstanceCreditSpecifications",
-        "ec2:TerminateInstances"
+        "ec2:TerminateInstances",
+        "ec2:CreateInstanceConnectEndpoint",
+        "ec2:CreateNetworkInterface",
+        "ec2:CreateTags",
+        "iam:CreateServiceLinkedRole",
+        "ec2:DescribeInstanceConnectEndpoints",
+        "ec2:DeleteInstanceConnectEndpoint",
+        "ec2-instance-connect:OpenTunnel"
       ],
       "Resource": "*"
     }

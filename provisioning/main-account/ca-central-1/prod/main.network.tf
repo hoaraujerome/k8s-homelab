@@ -14,3 +14,10 @@ module "vpc" {
     }
   }
 }
+
+module "ec2-instance-connect-endpoint" {
+  source = "../../../modules/network-ec2-instance-connect-endpoint"
+
+  subnet_id = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.k8s_cluster_subnet_name}"]
+}
+
