@@ -3,6 +3,11 @@ variable "subnet_id" {
   nullable = false
 }
 
+variable "security_group_ids" {
+  type    = set(string)
+  default = []
+}
+
 variable "tag_prefix" {
   type    = string
   default = ""

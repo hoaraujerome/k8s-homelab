@@ -27,8 +27,8 @@ resource "aws_instance" "this" {
   instance_type               = local.ec2_instance_type
   subnet_id                   = var.subnet_id
   associate_public_ip_address = false
-  # vpc_security_group_ids      = var.security_group_ids
-  key_name = var.key_pair_name
+  vpc_security_group_ids      = var.security_group_ids
+  key_name                    = var.key_pair_name
 
   root_block_device {
     encrypted = true

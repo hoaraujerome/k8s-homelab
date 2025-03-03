@@ -38,3 +38,4 @@ resource "aws_security_group" "test1" {
 output "sg1_id" {
   value = aws_security_group.test1.id
 }
+
