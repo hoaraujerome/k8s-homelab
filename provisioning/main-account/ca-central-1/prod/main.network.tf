@@ -1,6 +1,7 @@
 locals {
   vpc_ipv4_cidr_block                = "10.0.0.0/16"
   k8s_cluster_subnet_ipv4_cidr_block = "10.0.1.0/24"
+  nat_gateway_subnet_ipv4_cidr_block = "10.0.2.0/24"
 }
 
 module "vpc" {
@@ -11,6 +12,9 @@ module "vpc" {
   subnets = {
     (local.k8s_cluster_subnet_name) = {
       ipv4_cidr_block = local.k8s_cluster_subnet_ipv4_cidr_block
+    }
+    (local.nat_gateway_subnet_name) = {
+      ipv4_cidr_block = local.nat_gateway_subnet_ipv4_cidr_block
     }
   }
 }
@@ -48,3 +52,38 @@ module "ec2-instance-connect-endpoint" {
   tag_prefix         = local.tag_prefix
 }
 
+module "internet-gateway" {
+  source = "../../../modules/network-internetgateway"
+
+  vpc_id     = module.vpc.vpc_id
+  tag_prefix = local.tag_prefix
+}
+
+module "internet-gateway-route-table" {
+  source = "../../../modules/network-routetable-all-traffic"
+
+  vpc_id       = module.vpc.vpc_id
+  subnet_id    = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.nat_gateway_subnet_name}"]
+  gateway_id   = module.internet-gateway.id
+  gateway_type = "igw"
+  tag_prefix   = local.tag_prefix
+}
+
+module "nat-gateway" {
+  source = "../../../modules/network-natgateway"
+
+  subnet_id  = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.nat_gateway_subnet_name}"]
+  tag_prefix = local.tag_prefix
+
+  depends_on = [module.internet-gateway]
+}
+
+module "nat-gateway-route-table" {
+  source = "../../../modules/network-routetable-all-traffic"
+
+  vpc_id       = module.vpc.vpc_id
+  subnet_id    = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.k8s_cluster_subnet_name}"]
+  gateway_id   = module.nat-gateway.id
+  gateway_type = "nat"
+  tag_prefix   = local.tag_prefix
+}

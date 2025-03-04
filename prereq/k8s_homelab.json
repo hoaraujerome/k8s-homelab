@@ -14,6 +14,18 @@
     {
       "Effect": "Allow",
       "Action": [
+        "ec2-instance-connect:OpenTunnel"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "NumericEquals": {
+          "ec2-instance-connect:remotePort": "22"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "ec2-instance-connect:SendSSHPublicKey"
       ],
       "Resource": "*",
@@ -54,7 +66,6 @@
         "iam:CreateServiceLinkedRole",
         "ec2:DescribeInstanceConnectEndpoints",
         "ec2:DeleteInstanceConnectEndpoint",
-        "ec2-instance-connect:OpenTunnel",
         "ec2:CreateSecurityGroup",
         "ec2:DescribeSecurityGroups",
         "ec2:ModifySecurityGroupRules",
@@ -64,7 +75,26 @@
         "ec2:DescribeSecurityGroupRules",
         "ec2:ModifyNetworkInterfaceAttribute",
         "ec2:AuthorizeSecurityGroupIngress",
-        "ec2:AuthorizeSecurityGroupEgress"
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:CreateInternetGateway",
+        "ec2:AttachInternetGateway",
+        "ec2:DescribeInternetGateways",
+        "ec2:DeleteInternetGateway",
+        "ec2:DetachInternetGateway",
+        "ec2:CreateRouteTable",
+        "ec2:DescribeRouteTables",
+        "ec2:DeleteRouteTable",
+        "ec2:CreateRoute",
+        "ec2:AssociateRouteTable",
+        "ec2:DisassociateRouteTable",
+        "ec2:AllocateAddress",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeAddressesAttribute",
+        "ec2:ReleaseAddress",
+        "ec2:DisassociateAddress",
+        "ec2:CreateNatGateway",
+        "ec2:DeleteNatGateway",
+        "ec2:DescribeNatGateways"
       ],
       "Resource": "*"
     }

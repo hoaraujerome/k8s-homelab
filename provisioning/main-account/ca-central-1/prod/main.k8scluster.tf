@@ -1,3 +1,9 @@
+locals {
+  anywhere_ip_v4 = "0.0.0.0/0"
+  http_port      = 80
+  https_port     = 443
+}
+
 module "k8s-cluster-ssh-public-key" {
   source = "../../../modules/compute-sshpublickey"
 
@@ -25,6 +31,22 @@ module "k8s-cluster-ec2-control-plane-security-group-rules" {
       to_port                      = local.ssh_port
       ip_protocol                  = local.tcp_protocol
       referenced_security_group_id = module.ec2-instance-connect-endpoint-security-groups.security_group_id[local.ec2_instance_connect_endpoint_component]
+    }
+    "http-outbound-traffic" = {
+      description = "Allow HTTP outbound traffic"
+      direction   = "outbound"
+      from_port   = local.http_port
+      to_port     = local.http_port
+      ip_protocol = local.tcp_protocol
+      cidr_ipv4   = local.anywhere_ip_v4
+    }
+    "https-outbound-traffic" = {
+      description = "Allow HTTPS outbound traffic"
+      direction   = "outbound"
+      from_port   = local.https_port
+      to_port     = local.https_port
+      ip_protocol = local.tcp_protocol
+      cidr_ipv4   = local.anywhere_ip_v4
     }
   }
   tag_prefix = local.tag_prefix
