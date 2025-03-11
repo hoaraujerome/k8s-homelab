@@ -32,13 +32,21 @@ module "ec2-instance-connect-endpoint-security-group-rules" {
 
   security_group_id = module.ec2-instance-connect-endpoint-security-groups.security_group_id[local.ec2_instance_connect_endpoint_component]
   rules = {
-    "ssh-outbound-traffic" = {
-      description                  = "Allows outbound SSH traffic to all instances associated with the instance security group"
+    "ssh-control-plane-outbound-traffic" = {
+      description                  = "Allows outbound SSH traffic to control plane"
       direction                    = "outbound"
       from_port                    = local.ssh_port
       to_port                      = local.ssh_port
       ip_protocol                  = local.tcp_protocol
-      referenced_security_group_id = module.k8s-cluster-ec2-control-plane-security-groups.security_group_id[local.k8s_control_plane_component]
+      referenced_security_group_id = module.k8s-cluster-security-groups.security_group_id[local.k8s_control_plane_component]
+    }
+    "ssh-worker-nodes-outbound-traffic" = {
+      description                  = "Allows outbound SSH traffic to worker nodes"
+      direction                    = "outbound"
+      from_port                    = local.ssh_port
+      to_port                      = local.ssh_port
+      ip_protocol                  = local.tcp_protocol
+      referenced_security_group_id = module.k8s-cluster-security-groups.security_group_id[local.k8s_worker_node_component]
     }
   }
   tag_prefix = local.tag_prefix

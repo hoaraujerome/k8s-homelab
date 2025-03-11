@@ -18,7 +18,7 @@ run "check_ec2" {
   command = plan
 
   assert {
-    condition     = aws_instance.this.instance_type == "t4g.nano"
+    condition     = aws_instance.this.instance_type == "t4g.small"
     error_message = "Invalid instance type"
   }
 

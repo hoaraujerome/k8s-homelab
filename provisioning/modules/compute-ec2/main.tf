@@ -3,7 +3,7 @@ locals {
   ami_hardware_virtual_machine = "hvm"
   # https://ubuntu.com/server/docs/cloud-images/amazon-ec2
   ami_canonical_aws_owner_id = "099720109477"
-  ec2_instance_type          = "t4g.nano"
+  ec2_instance_type          = "t4g.small"
 }
 
 data "aws_ami" "ubuntu" {
