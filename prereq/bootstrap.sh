@@ -4,6 +4,142 @@ AWS_PROFILE="k8s_homelab_prereq"
 BUCKET_NAME="hoaraujerome-k8s-homelab"
 TERRAFORM_SERVICE_ACCOUNT_NAME="k8s_homelab"
 
+create_networking_for_packer() {
+  echo "Create VPC for Packer"
+  local output
+  local exit_code
+  output=$(
+    aws ec2 create-vpc \
+      --cidr-block 10.50.0.0/16 \
+      --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=packer-vpc}]' \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  local vpc_id=$(
+    echo ${output} | jq -r '.Vpc.VpcId'
+  )
+  echo "${vpc_id}"
+
+  echo "Create Internet Gateway for Packer"
+  output=$(
+    aws ec2 create-internet-gateway \
+      --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=packer-igw}]' \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  local igw_id=$(
+    echo ${output} | jq -r '.InternetGateway.InternetGatewayId'
+  )
+  echo "${igw_id}"
+
+  echo "Attach Internet Gateway to VPC for Packer"
+  output=$(
+    aws ec2 attach-internet-gateway \
+      --internet-gateway-id "${igw_id}" \
+      --vpc-id "${vpc_id}" \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  echo "Create subnet for Packer"
+  output=$(
+    aws ec2 create-subnet \
+      --vpc-id ${vpc_id} \
+      --cidr-block 10.50.1.0/24 \
+      --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=packer-subnet}]' \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  local subnet_id=$(
+    echo ${output} | jq -r '.Subnet.SubnetId'
+  )
+  echo "${subnet_id}"
+
+  echo "Create route table for Packer"
+  output=$(
+    aws ec2 create-route-table \
+      --vpc-id ${vpc_id} \
+      --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=packer-rt}]' \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  local rt_id=$(
+    echo ${output} | jq -r '.RouteTable.RouteTableId'
+  )
+  echo "${rt_id}"
+
+  echo "Create route for Packer"
+  output=$(
+    aws ec2 create-route \
+      --route-table-id "${rt_id}" \
+      --destination-cidr-block 0.0.0.0/0 \
+      --gateway-id "${igw_id}" \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  echo "Associate route table for Packer"
+  output=$(
+    aws ec2 associate-route-table \
+      --subnet-id "${subnet_id}" \
+      --route-table-id "${rt_id}" \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+
+  echo "Enable auto-assign public IPs on subnet"
+  output=$(
+    aws ec2 modify-subnet-attribute \
+      --subnet-id ${subnet_id} \
+      --map-public-ip-on-launch \
+      --profile "${AWS_PROFILE}" 2>&1
+  )
+  exit_code=$?
+
+  if [ ${exit_code} -ne 0 ]; then
+    echo "$(basename $0) - error: ${output}" >&2
+    exit ${exit_code}
+  fi
+}
+
 create_terraform_backend() {
   echo "Create Terraform Backend"
 
@@ -93,6 +229,7 @@ create_terraform_service_account() {
 }
 
 main() {
+  # create_networking_for_packer
   create_terraform_backend
   create_terraform_service_account
 }

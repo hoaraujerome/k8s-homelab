@@ -6,6 +6,9 @@ SHELL := /usr/bin/env bash
 prereq:
 	./prereq/bootstrap.sh
 
+build:
+	./image-building/build.sh
+
 plan:
 	./provisioning/provision.sh plan
 
