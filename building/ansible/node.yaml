@@ -1,0 +1,14 @@
+- name: Localizes the Ubuntu image for K8S
+  hosts: default
+  become: true
+  gather_facts: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: SSH connection test
+      ansible.builtin.include_role:
+        name: display_time
+    - name: Set OS settings
+      ansible.builtin.include_role:
+        name: node

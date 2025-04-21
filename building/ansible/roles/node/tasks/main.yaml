@@ -1,0 +1,76 @@
+- name: Configure systemd journald
+  block:
+    - name: Ensure "drop-ins" directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/journald.conf.d
+        state: directory
+        mode: "0755"
+
+    - name: Ensure storage.conf exists with correct content
+      ansible.builtin.copy:
+        dest: /etc/systemd/journald.conf.d/storage.conf
+        content: |
+          [Journal]
+          Storage=persistent
+        mode: "0644"
+
+    - name: Restart journald
+      ansible.builtin.systemd_service:
+        name: systemd-journald
+        state: restarted
+        daemon_reload: true
+
+- name: Configure swap
+  block:
+    - name: Check if swap is active
+      ansible.builtin.command: swapon --summary
+      register: swap_status
+      changed_when: false
+      failed_when: false
+
+    - name: Disable swap memory
+      ansible.builtin.command: swapoff -a
+      when: swap_status.stdout != ""
+      changed_when: true
+
+- name: Configure kernel modules
+  block:
+    - name: Ensure overlay module is present
+      community.general.modprobe:
+        name: overlay
+        state: present
+
+    - name: Ensure br_netfilter module is present
+      community.general.modprobe:
+        name: br_netfilter
+        state: present
+
+    - name: Persist required kernel modules
+      ansible.builtin.copy:
+        content: |
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/kubernetes.conf
+        mode: "0644"
+
+- name: Set and persist kernel params
+  ansible.posix.sysctl:
+    name: "{{ item.param }}"
+    value: "{{ item.val }}"
+    state: present
+    sysctl_set: true
+    sysctl_file: /etc/sysctl.conf
+    reload: true
+  loop:
+    - { param: net.bridge.bridge-nf-call-iptables, val: 1 }
+    - { param: net.bridge.bridge-nf-call-ip6tables, val: 1 }
+    - { param: net.ipv4.ip_forward, val: 1 }
+    - { param: net.ipv6.conf.all.forwarding, val: 1 }
+    - { param: net.ipv6.conf.all.disable_ipv6, val: 0 }
+    - { param: net.ipv4.tcp_congestion_control, val: bbr }
+    - { param: net.ipv4.conf.all.rp_filter, val: 1 }
+    - { param: vm.overcommit_memory, val: 1 }
+    - { param: kernel.panic, val: 10 }
+    - { param: kernel.panic_on_oops, val: 1 }
+    - { param: fs.inotify.max_user_instances, val: 8192 }
+    - { param: fs.inotify.max_user_watches, val: 524288 }

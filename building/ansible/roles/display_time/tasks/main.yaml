@@ -1,0 +1,9 @@
+---
+- name: Display current time
+  ansible.builtin.command: date
+  register: current_time
+  changed_when: false
+
+- name: Print current time
+  ansible.builtin.debug:
+    msg: "The current time on {{ inventory_hostname }} is {{ current_time.stdout }}"

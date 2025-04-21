@@ -3,7 +3,7 @@
 set -e
 
 AWS_PROFILE="k8s_homelab"
-CONFIGURATION_PATH="./image-building/packer"
+CONFIGURATION_PATH="./building/packer"
 
 log_message() {
   local message="${1}"

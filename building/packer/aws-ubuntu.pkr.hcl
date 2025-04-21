@@ -4,6 +4,11 @@ packer {
       version = "~> 1.3.6"
       source  = "github.com/hashicorp/amazon"
     }
+
+    ansible = {
+      version = "~> 1.1.3"
+      source  = "github.com/hashicorp/ansible"
+    }
   }
 }
 
@@ -20,7 +25,7 @@ variable "subnet_id" {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "learn-packer-linux-aws"
+  ami_name      = "ubuntu-2404-{{timestamp}}"
   instance_type = "t4g.small"
   region        = var.region
   vpc_id        = var.vpc_id
@@ -38,8 +43,11 @@ source "amazon-ebs" "ubuntu" {
 }
 
 build {
-  name = "learn-packer"
   sources = [
     "source.amazon-ebs.ubuntu"
   ]
+
+  provisioner "ansible" {
+    playbook_file = "../ansible/node.yaml"
+  }
 }

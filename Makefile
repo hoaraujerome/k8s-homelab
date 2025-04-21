@@ -7,7 +7,7 @@ prereq:
 	./prereq/bootstrap.sh
 
 build:
-	./image-building/build.sh
+	./building/build.sh
 
 plan:
 	./provisioning/provision.sh plan

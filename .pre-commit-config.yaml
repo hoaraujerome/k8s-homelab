@@ -13,3 +13,9 @@ repos:
     rev: v8.20.1
     hooks:
       - id: gitleaks
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v25.2.1
+    hooks:
+      - id: ansible-lint
+        additional_dependencies:
+          - ansible
