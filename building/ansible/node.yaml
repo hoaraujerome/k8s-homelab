@@ -6,12 +6,19 @@
     ansible_python_interpreter: /usr/bin/python3
 
   tasks:
-    - name: SSH connection test
+    # - name: SSH connection test
+    #   ansible.builtin.include_role:
+    #     name: display_time
+    # TODO move to the bottom
+    - name: Set up AWS provider settings
       ansible.builtin.include_role:
-        name: display_time
+        name: aws
     - name: Set up OS settings
       ansible.builtin.include_role:
         name: node
     - name: Set up containerd
       ansible.builtin.include_role:
         name: containerd
+    - name: Set up Kubernetes
+      ansible.builtin.include_role:
+        name: kubernetes

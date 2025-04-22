@@ -1,0 +1,31 @@
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add Kubernetes’s official GPG key
+  ansible.builtin.apt_key:
+    url: https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key
+    keyring: "{{ kubernetes_repo_key }}"
+    state: present
+
+- name: Add Kubernetes apt repository
+  ansible.builtin.apt_repository:
+    filename: kubernetes
+    repo: >-
+      deb [signed-by={{ kubernetes_repo_key }}]
+      https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /
+    state: present
+
+- name: Install Kubernetes
+  ansible.builtin.apt:
+    name: "{{ kubernetes_packages }}"
+    update_cache: true
+    state: present
+
+- name: Hold Kubernetes packages
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ kubernetes_packages }}"
