@@ -9,6 +9,9 @@
     - name: SSH connection test
       ansible.builtin.include_role:
         name: display_time
-    - name: Set OS settings
+    - name: Set up OS settings
       ansible.builtin.include_role:
         name: node
+    - name: Set up containerd
+      ansible.builtin.include_role:
+        name: containerd
