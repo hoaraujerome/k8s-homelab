@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# first non-loopback IPv4
+IP=$(hostname -I | awk '{print $1}')
+grep -q 'controlplane' /etc/hosts || echo "$IP {{ kubernetes_control_plane_host_name }}" >>/etc/hosts

@@ -1,3 +1,4 @@
+---
 - name: Localizes the Ubuntu image for K8S
   hosts: default
   become: true
@@ -9,10 +10,6 @@
     # - name: SSH connection test
     #   ansible.builtin.include_role:
     #     name: display_time
-    # TODO move to the bottom
-    - name: Set up AWS provider settings
-      ansible.builtin.include_role:
-        name: aws
     - name: Set up OS settings
       ansible.builtin.include_role:
         name: node

@@ -1,3 +1,4 @@
+---
 - name: Configure systemd journald
   block:
     - name: Ensure "drop-ins" directory exists
@@ -70,15 +71,27 @@
     sysctl_file: /etc/sysctl.conf
     reload: true
   loop:
-    - { param: net.bridge.bridge-nf-call-iptables, val: 1 }
-    - { param: net.bridge.bridge-nf-call-ip6tables, val: 1 }
-    - { param: net.ipv4.ip_forward, val: 1 }
-    - { param: net.ipv6.conf.all.forwarding, val: 1 }
-    - { param: net.ipv6.conf.all.disable_ipv6, val: 0 }
-    - { param: net.ipv4.tcp_congestion_control, val: bbr }
-    - { param: net.ipv4.conf.all.rp_filter, val: 1 }
-    - { param: vm.overcommit_memory, val: 1 }
-    - { param: kernel.panic, val: 10 }
-    - { param: kernel.panic_on_oops, val: 1 }
-    - { param: fs.inotify.max_user_instances, val: 8192 }
-    - { param: fs.inotify.max_user_watches, val: 524288 }
+    - param: net.bridge.bridge-nf-call-iptables
+      val: 1
+    - param: net.bridge.bridge-nf-call-ip6tables
+      val: 1
+    - param: net.ipv4.ip_forward
+      val: 1
+    - param: net.ipv6.conf.all.forwarding
+      val: 1
+    - param: net.ipv6.conf.all.disable_ipv6
+      val: 0
+    - param: net.ipv4.tcp_congestion_control
+      val: bbr
+    - param: net.ipv4.conf.all.rp_filter
+      val: 1
+    - param: vm.overcommit_memory
+      val: 1
+    - param: kernel.panic
+      val: 10
+    - param: kernel.panic_on_oops
+      val: 1
+    - param: fs.inotify.max_user_instances
+      val: 8192
+    - param: fs.inotify.max_user_watches
+      val: 524288

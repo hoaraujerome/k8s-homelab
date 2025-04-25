@@ -1,7 +1,0 @@
-- name: Create cloud-init config for dynamic hosts entry
-  ansible.builtin.copy:
-    src: etc/cloud/cloud.cfg.d/99_hosts.cfg
-    dest: /etc/cloud/cloud.cfg.d/99_hosts.cfg
-    owner: root
-    group: root
-    mode: "0644"

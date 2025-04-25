@@ -1,6 +1,11 @@
+---
 kubernetes_repo_key: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 kubernetes_version: v1.32
 kubernetes_packages:
   - kubelet
   - kubeadm
   - kubectl
+kubernetes_control_plane_host_name: k8scp
+kubernetes_update_hosts_script_path: usr/local/bin/update-hosts.sh
+kubernetes_cloud_init_dynamic_hosts_config_path: etc/cloud/cloud.cfg.d/99_hosts.cfg
+kubernetes_kubeadm_config_path: root/kubeadm-config.yaml

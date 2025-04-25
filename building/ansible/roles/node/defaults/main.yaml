@@ -1,0 +1,3 @@
+---
+node_update_hosts_script_path: usr/local/bin/update-hosts.sh
+node_cloud_init_dynamic_hosts_config_path: etc/cloud/cloud.cfg.d/99_hosts.cfg

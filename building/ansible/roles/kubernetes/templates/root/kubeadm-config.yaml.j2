@@ -1,0 +1,6 @@
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+kubernetesVersion: 1.32.4
+controlPlaneEndpoint: "{{ kubernetes_control_plane_host_name }}:6443"
+networking:
+  podSubnet: 192.168.0.0/16
