@@ -1,0 +1,12 @@
+[Unit]
+Description=Kubernetes Control Plane Initialization
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart="/{{ kubernetes_kubeadm_init_script_path }}"
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

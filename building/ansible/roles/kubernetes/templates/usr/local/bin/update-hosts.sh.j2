@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+echo "Updating /etc/hosts..."
 # first non-loopback IPv4
 IP=$(hostname -I | awk '{print $1}')
-grep -q 'controlplane' /etc/hosts || echo "$IP {{ kubernetes_control_plane_host_name }}" >>/etc/hosts
+HOSTNAME="{{ kubernetes_control_plane_host_name }}"
+
+if grep -q "${HOSTNAME}" /etc/hosts; then
+  sed -i "s/^.*${HOSTNAME}\$/${IP} ${HOSTNAME}/" /etc/hosts
+else
+  echo "${IP} ${HOSTNAME}" >>/etc/hosts
+fi

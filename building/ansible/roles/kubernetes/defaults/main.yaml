@@ -7,5 +7,7 @@ kubernetes_packages:
   - kubectl
 kubernetes_control_plane_host_name: k8scp
 kubernetes_update_hosts_script_path: usr/local/bin/update-hosts.sh
-kubernetes_cloud_init_dynamic_hosts_config_path: etc/cloud/cloud.cfg.d/99_hosts.cfg
+kubernetes_kubeadm_init_script_path: usr/local/bin/kubeadm-init.sh
+kubernetes_kubeadm_init_service_path: etc/systemd/system/kubeadm-init.service
+kubernetes_cloud_init_k8s_config_path: etc/cloud/cloud.cfg.d/99_k8s.cfg
 kubernetes_kubeadm_config_path: root/kubeadm-config.yaml

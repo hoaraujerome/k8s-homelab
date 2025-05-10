@@ -30,7 +30,15 @@
     selection: hold
   loop: "{{ kubernetes_packages }}"
 
-- name: Configure hosts
+- name: Create kubeadm-config file
+  ansible.builtin.template:
+    src: "{{ kubernetes_kubeadm_config_path }}.j2"
+    dest: "/{{ kubernetes_kubeadm_config_path }}"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Configure cloud-init
   block:
     - name: Create update-hosts script
       ansible.builtin.template:
@@ -40,18 +48,26 @@
         group: root
         mode: "0740"
 
-    - name: Create cloud-init config for dynamic hosts entry
+    - name: Create kubeadm-init script
       ansible.builtin.template:
-        src: "{{ kubernetes_cloud_init_dynamic_hosts_config_path }}.j2"
-        dest: "/{{ kubernetes_cloud_init_dynamic_hosts_config_path }}"
+        src: "{{ kubernetes_kubeadm_init_script_path }}.j2"
+        dest: "/{{ kubernetes_kubeadm_init_script_path }}"
+        owner: root
+        group: root
+        mode: "0740"
+
+    - name: Create kubeadm-init service
+      ansible.builtin.template:
+        src: "{{ kubernetes_kubeadm_init_service_path }}.j2"
+        dest: "/{{ kubernetes_kubeadm_init_service_path }}"
+        owner: root
+        group: root
+        mode: "0640"
+
+    - name: Create cloud-init k8s config
+      ansible.builtin.template:
+        src: "{{ kubernetes_cloud_init_k8s_config_path }}.j2"
+        dest: "/{{ kubernetes_cloud_init_k8s_config_path }}"
         owner: root
         group: root
         mode: "0644"
-
-- name: Create kubeadm-config file
-  ansible.builtin.template:
-    src: "{{ kubernetes_kubeadm_config_path }}.j2"
-    dest: "/{{ kubernetes_kubeadm_config_path }}"
-    owner: root
-    group: root
-    mode: "0600"

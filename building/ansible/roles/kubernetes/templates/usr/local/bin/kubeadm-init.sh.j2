@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Checking Kubernetes initialization..."
+if [ ! -f /etc/kubernetes/admin.conf ]; then
+  echo "[+] Running kubeadm init..."
+  kubeadm init --config="/{{ kubernetes_kubeadm_config_path }}" --upload-certs --node-name="{{ kubernetes_control_plane_host_name }}" | tee /root/kubeadm-init.out
+else
+  echo "[~] Kubernetes already initialized, skipping."
+fi
