@@ -4,6 +4,7 @@ AWS_PROFILE="k8s_homelab_prereq"
 BUCKET_NAME="hoaraujerome-k8s-homelab"
 TERRAFORM_SERVICE_ACCOUNT_NAME="k8s_homelab"
 
+# TODO to delete after migration to foundations
 create_networking_for_packer() {
   echo "Create VPC for Packer"
   local output

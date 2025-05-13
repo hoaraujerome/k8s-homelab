@@ -17,11 +17,11 @@ variable "region" {
 }
 
 variable "vpc_id" {
-  default = "vpc-083e2ba257765a249"
+  type = string
 }
 
 variable "subnet_id" {
-  default = "subnet-027a214259a9047cb"
+  type = string
 }
 
 source "amazon-ebs" "ubuntu" {

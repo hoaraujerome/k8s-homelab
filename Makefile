@@ -1,13 +1,23 @@
 SHELL := /usr/bin/env bash
 
+# TODO review targets
 # Define targets
-.PHONY: prereq plan deploy destroy
+.PHONY: foundations prereq build plan deploy destroy
 
-prereq:
-	./prereq/bootstrap.sh
+foundations:
+	./foundations/setup-foundations.sh
 
-build:
-	./building/build.sh
+images-infra-plan:
+	./images/setup-images.sh plan
+
+images-infra-deploy:
+	./images/setup-images.sh deploy
+
+images-infra-destroy:
+	./images/setup-images.sh destroy
+
+images-config-build:
+	./images/setup-images.sh build
 
 plan:
 	./provisioning/provision.sh plan
