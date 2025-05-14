@@ -1,6 +1,7 @@
 ---
 kubernetes_repo_key: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 kubernetes_version: v1.32
+kubernetes_apt_version: 1.32.4-1.1
 kubernetes_packages:
   - kubelet
   - kubeadm

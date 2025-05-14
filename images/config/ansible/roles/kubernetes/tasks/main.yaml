@@ -18,11 +18,12 @@
       deb [signed-by={{ kubernetes_repo_key }}] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /
     state: present
 
-- name: Install Kubernetes
+- name: Install Kubernetes packages with pinned version
   ansible.builtin.apt:
-    name: "{{ kubernetes_packages }}"
+    name: "{{ item }}={{ kubernetes_apt_version }}"
     update_cache: true
     state: present
+  loop: "{{ kubernetes_packages }}"
 
 - name: Hold Kubernetes packages
   ansible.builtin.dpkg_selections:
