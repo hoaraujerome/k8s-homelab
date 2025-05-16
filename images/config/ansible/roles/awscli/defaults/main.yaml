@@ -1,0 +1,5 @@
+---
+awscli_pgp_public_key_path: tmp/aws-pgp-public-key.txt
+awscli_base_url: https://awscli.amazonaws.com/awscli-exe-linux-
+awscli_version: 2.27.14
+awscli_archive_path: /tmp/awscliv2.zip

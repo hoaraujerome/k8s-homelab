@@ -1,6 +1,6 @@
 run "setup_provider" {
   module {
-    source = "../../../tests/setup/aws_provider"
+    source = "../../tests/setup/aws_provider"
   }
 }
 

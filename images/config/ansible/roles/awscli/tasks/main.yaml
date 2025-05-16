@@ -1,0 +1,56 @@
+---
+- name: Install AWS CLI prerequisites
+  ansible.builtin.apt:
+    name: unzip
+    update_cache: true
+    state: present
+
+- name: Copy AWS GPG public key to remote
+  ansible.builtin.copy:
+    src: "{{ awscli_pgp_public_key_path }}"
+    dest: "/{{ awscli_pgp_public_key_path }}"
+    remote_src: false
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Import AWS GPG key
+  ansible.builtin.command: gpg --import "/{{ awscli_pgp_public_key_path }}"
+  changed_when: false
+
+- name: Download AWS CLI v2 archive
+  ansible.builtin.get_url:
+    url: "{{ awscli_base_url }}{{ ansible_architecture }}-{{ awscli_version }}.zip"
+    dest: "{{ awscli_archive_path }}"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Download AWS CLI v2 archive signature file
+  ansible.builtin.get_url:
+    url: "{{ awscli_base_url }}{{ ansible_architecture }}-{{ awscli_version }}.zip.sig"
+    dest: "{{ awscli_archive_path }}.sig"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Verify AWS CLI v2 archive
+  ansible.builtin.command: |
+    gpg --verify "{{ awscli_archive_path }}.sig" "{{ awscli_archive_path }}"
+  changed_when: false
+
+- name: Unzip AWS CLI v2 archive
+  ansible.builtin.unarchive:
+    src: "{{ awscli_archive_path }}"
+    dest: /tmp
+    remote_src: true
+
+- name: Install AWS CLI v2
+  ansible.builtin.command: |
+    /tmp/aws/install -i /usr/local/aws-cli -b /usr/local/sbin
+  changed_when: false
+
+- name: Remove temporary files
+  ansible.builtin.file:
+    path: /tmp/aws*
+    state: absent

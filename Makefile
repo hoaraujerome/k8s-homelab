@@ -1,8 +1,7 @@
 SHELL := /usr/bin/env bash
 
-# TODO review targets
 # Define targets
-.PHONY: foundations prereq build plan deploy destroy
+.PHONY: foundations images-infra-plan images-infra-deploy images-infra-destroy images-config-build cluster-infra-plan cluster-infra-deploy cluster-infra-destroy
 
 foundations:
 	./foundations/setup-foundations.sh
@@ -19,11 +18,11 @@ images-infra-destroy:
 images-config-build:
 	./images/setup-images.sh build
 
-plan:
-	./provisioning/provision.sh plan
+cluster-infra-plan:
+	./cluster/setup-cluster.sh plan
 
-deploy:
-	./provisioning/provision.sh deploy
+cluster-infra-deploy:
+	./cluster/setup-cluster.sh deploy
 
-destroy:
-	./provisioning/provision.sh destroy
+cluster-infra-destroy:
+	./cluster/setup-cluster.sh destroy
