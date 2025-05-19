@@ -17,3 +17,8 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+
+variable "iam_instance_profile" {
+  type     = string
+  nullable = false
+}

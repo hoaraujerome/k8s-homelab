@@ -4,13 +4,16 @@
     {
       "Effect": "Allow",
       "Action": "s3:ListBucket",
-      "Resource": "arn:aws:s3:::hoaraujerome-k8s-homelab"
+      "Resource": [
+        "arn:aws:s3:::hoaraujerome-k8s-homelab-cluster-infra",
+        "arn:aws:s3:::hoaraujerome-k8s-homelab-packer-infra"
+      ]
     },
     {
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
       "Resource": [
-        "arn:aws:s3:::hoaraujerome-k8s-homelab/*",
+        "arn:aws:s3:::hoaraujerome-k8s-homelab-cluster-infra/*",
         "arn:aws:s3:::hoaraujerome-k8s-homelab-packer-infra/*"
       ]
     },
@@ -103,7 +106,26 @@
         "ec2:DescribeRegions",
         "ec2:DescribeImages",
         "ec2:StopInstances",
-        "ec2:CreateImage"
+        "ec2:CreateImage",
+        "iam:CreateRole",
+        "iam:GetRole",
+        "iam:DeleteRole",
+        "iam:CreatePolicy",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:DeletePolicy",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfilesForRole",
+        "iam:ListPolicyVersions",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:CreateInstanceProfile",
+        "iam:GetInstanceProfile",
+        "iam:AddRoleToInstanceProfile",
+        "iam:DeleteInstanceProfile",
+        "iam:PassRole",
+        "iam:RemoveRoleFromInstanceProfile"
       ],
       "Resource": "*"
     }

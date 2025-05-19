@@ -29,6 +29,7 @@ resource "aws_instance" "this" {
   associate_public_ip_address = false
   vpc_security_group_ids      = var.security_group_ids
   key_name                    = var.key_pair_name
+  iam_instance_profile        = var.iam_instance_profile
 
   root_block_device {
     encrypted = true

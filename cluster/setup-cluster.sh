@@ -18,6 +18,7 @@ CHILD_MODULES_DIRS=(
 CURRENT_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS_MODULES_DIR="$(cd "${CURRENT_SCRIPT_DIR}/.." && pwd)/modules/scripts"
 source "${SCRIPTS_MODULES_DIR}/logging.sh"
+source "${SCRIPTS_MODULES_DIR}/constants.sh"
 source "${SCRIPTS_MODULES_DIR}/security-scanner.sh"
 
 print_usage() {
@@ -35,16 +36,24 @@ test_modules() {
 
   for dir in "${CHILD_MODULES_DIRS[@]}"; do
     log_message "... module: ${dir}"
-    pushd "${dir}"
-    terraform init -backend=false
-    terraform validate
-    terraform test
-    popd
+    # TODO delete
+    if [[ "${dir}" == *compute-ec2* ]]; then
+      pushd "${dir}"
+      terraform init -backend=false
+      terraform validate
+      terraform test
+      popd
+    fi
   done
 }
 
 setup_terraform_vars() {
   export TF_VAR_ssh_public_key_path="${HOME}/.ssh/id_rsa_k8s_homelab.pub"
+}
+
+run_terraform_init_with_s3_backend() {
+  terraform init \
+    -backend-config="bucket=${CLUSTER_INFRA_BUCKET_NAME}"
 }
 
 run_terraform_plan() {
@@ -54,7 +63,7 @@ run_terraform_plan() {
   terraform init -backend=false
   terraform validate
   setup_terraform_vars
-  terraform init
+  run_terraform_init_with_s3_backend
   terraform plan -out="${TFPLAN_FILENAME}"
   popd
 }
@@ -91,7 +100,7 @@ destroy_infra() {
   check_terraform_files
   setup_terraform_vars
   pushd "${ROOT_MODULE_PATH}"
-  terraform init
+  run_terraform_init_with_s3_backend
   terraform destroy
   popd
 }

@@ -6,9 +6,10 @@ run "setup_aws_provider" {
 
 run "check_ec2" {
   variables {
-    subnet_id          = "subnetid"
-    security_group_ids = ["sg1", "sg2", "sg3"]
-    key_pair_name      = "keypairname"
+    subnet_id            = "subnetid"
+    security_group_ids   = ["sg1", "sg2", "sg3"]
+    key_pair_name        = "keypairname"
+    iam_instance_profile = "profile"
     tags = {
       Name = "prefix-ec2"
       Role = "myrole"
@@ -58,6 +59,11 @@ run "check_ec2" {
   }
 
   assert {
+    condition     = aws_instance.this.iam_instance_profile == var.iam_instance_profile
+    error_message = "Invalid instance IAM instance profile"
+  }
+
+  assert {
     condition     = aws_instance.this.tags == var.tags
     error_message = "Invalid instance tags"
   }
@@ -78,16 +84,17 @@ run "check_ec2" {
   }
 }
 
-run "setup_networking" {
+run "setup_prereq" {
   module {
-    source = "./tests/setup/networking"
+    source = "./tests/setup/prereq"
   }
 }
 
 run "create_ec2" {
   variables {
-    subnet_id          = run.setup_networking.subnet_id
-    security_group_ids = [run.setup_networking.sg1_id]
+    subnet_id            = run.setup_prereq.subnet_id
+    security_group_ids   = [run.setup_prereq.sg1_id]
+    iam_instance_profile = run.setup_prereq.instance_profile_name
   }
 
   command = apply

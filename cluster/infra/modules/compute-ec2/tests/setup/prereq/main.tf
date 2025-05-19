@@ -39,3 +39,29 @@ output "sg1_id" {
   value = aws_security_group.test1.id
 }
 
+data "aws_iam_policy_document" "test" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "test" {
+  name               = "tests-instance-profile"
+  assume_role_policy = data.aws_iam_policy_document.test.json
+}
+
+resource "aws_iam_instance_profile" "test" {
+  name = "tests-instance-profile"
+  role = aws_iam_role.test.name
+}
+
+output "instance_profile_name" {
+  value = aws_iam_instance_profile.test.name
+}
