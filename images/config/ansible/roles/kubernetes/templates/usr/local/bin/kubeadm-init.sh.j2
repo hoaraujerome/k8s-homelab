@@ -1,10 +1,36 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
-echo "Checking Kubernetes initialization..."
-if [ ! -f /etc/kubernetes/admin.conf ]; then
-  echo "[+] Running kubeadm init..."
-  kubeadm init --config="/{{ kubernetes_kubeadm_config_path }}" --upload-certs --node-name="{{ kubernetes_control_plane_host_name }}" | tee /root/kubeadm-init.out
+# Fetch instance role from EC2 metadata
+echo "[*] Fetching EC2 instance role tag..."
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+ROLE=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/tags/instance/Role)
+
+echo "[*] EC2 instance role: $ROLE"
+
+if [[ "$ROLE" == "k8s-control-plane" ]]; then
+  echo "Checking Kubernetes initialization..."
+  if [ ! -f /etc/kubernetes/admin.conf ]; then
+    echo "[+] Running kubeadm init..."
+    kubeadm init --config="/{{ kubernetes_kubeadm_config_path }}" \
+      --upload-certs \
+      --node-name="{{ kubernetes_control_plane_host_name }}" |
+      tee /root/kubeadm-init.out
+
+    echo "[+] Save join command..."
+    WORKER_NODE_JOIN_COMMAND=$(kubeadm token create --ttl 0 --description "Auto-scaled nodes" --print-join-command)
+    aws ssm put-parameter \
+      --name "/k8s-homelab/worker-node-join-command" \
+      --value "${WORKER_NODE_JOIN_COMMAND}" \
+      --type "SecureString" \
+      --overwrite
+  else
+    echo "[~] Kubernetes already initialized, skipping."
+  fi
 else
-  echo "[~] Kubernetes already initialized, skipping."
+  echo "[!] Skipping Kubernetes init: instance role is not 'k8s-control-plane'."
 fi

@@ -54,7 +54,12 @@ run "check_ec2" {
   }
 
   assert {
-    condition     = aws_instance.this.ami == data.aws_ami.ubuntu.id
+    condition     = aws_instance.this.metadata_options[0].instance_metadata_tags == "enabled"
+    error_message = "Invalid instance metadata tags for metadata options"
+  }
+
+  assert {
+    condition     = aws_instance.this.ami == data.aws_ami.ubuntu_k8s.id
     error_message = "Invalid instance ami id"
   }
 
@@ -69,17 +74,17 @@ run "check_ec2" {
   }
 
   assert {
-    condition     = data.aws_ami.ubuntu.most_recent == true
+    condition     = data.aws_ami.ubuntu_k8s.most_recent == true
     error_message = "Invalid ami most recent"
   }
 
   assert {
-    condition     = startswith(data.aws_ami.ubuntu.name, "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server") == true
+    condition     = startswith(data.aws_ami.ubuntu_k8s.name, "ubuntu-2404-") == true
     error_message = "Invalid ami name"
   }
 
   assert {
-    condition     = alltrue([for owner in data.aws_ami.ubuntu.owners : contains(["099720109477"], owner)])
+    condition     = alltrue([for owner in data.aws_ami.ubuntu_k8s.owners : contains(["self"], owner)])
     error_message = "Invalid ami owners"
   }
 }

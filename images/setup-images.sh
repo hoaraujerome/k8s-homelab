@@ -104,7 +104,6 @@ run_packer_build() {
   pushd "${CONFIGURATION_PATH}"
   packer fmt -check -diff -recursive .
   setup_packer_vars
-  echo "foo"
   echo $PKR_VAR_vpc_id
   packer init .
   packer validate .

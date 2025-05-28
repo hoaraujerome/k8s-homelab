@@ -1,30 +1,16 @@
-locals {
-  ami_ubuntu_prefix_name       = "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*"
-  ami_hardware_virtual_machine = "hvm"
-  # https://ubuntu.com/server/docs/cloud-images/amazon-ec2
-  ami_canonical_aws_owner_id = "099720109477"
-  ec2_instance_type          = "t4g.small"
-}
-
-data "aws_ami" "ubuntu" {
+data "aws_ami" "ubuntu_k8s" {
   most_recent = true
+  owners      = ["self"]
 
   filter {
     name   = "name"
-    values = [local.ami_ubuntu_prefix_name]
+    values = ["ubuntu-2404-*"]
   }
-
-  filter {
-    name   = "virtualization-type"
-    values = [local.ami_hardware_virtual_machine]
-  }
-
-  owners = [local.ami_canonical_aws_owner_id]
 }
 
 resource "aws_instance" "this" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = local.ec2_instance_type
+  ami                         = data.aws_ami.ubuntu_k8s.id
+  instance_type               = "t4g.small"
   subnet_id                   = var.subnet_id
   associate_public_ip_address = false
   vpc_security_group_ids      = var.security_group_ids
@@ -36,7 +22,8 @@ resource "aws_instance" "this" {
   }
 
   metadata_options {
-    http_tokens = "required"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
   }
 
   tags = var.tags

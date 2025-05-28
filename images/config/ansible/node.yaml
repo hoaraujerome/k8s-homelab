@@ -10,16 +10,15 @@
     # - name: SSH connection test
     #   ansible.builtin.include_role:
     #     name: display_time
-    # TODO
-    - name: Set up AWS CLI
-      ansible.builtin.include_role:
-        name: awscli
     - name: Set up OS settings
       ansible.builtin.include_role:
         name: node
     - name: Set up containerd
       ansible.builtin.include_role:
         name: containerd
+    - name: Set up AWS CLI
+      ansible.builtin.include_role:
+        name: awscli
     - name: Set up Kubernetes
       ansible.builtin.include_role:
         name: kubernetes
