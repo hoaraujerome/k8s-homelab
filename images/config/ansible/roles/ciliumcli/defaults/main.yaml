@@ -1,0 +1,7 @@
+---
+ciliumcli_base_url: https://github.com/cilium/cilium-cli/releases/download/
+ciliumcli_version: v0.18.3
+ciliumcli_archive: "cilium-linux-arm64.tar.gz"
+ciliumcli_tmp_directory: "/tmp"
+ciliumcli_archive_path: "{{ ciliumcli_tmp_directory }}/{{ ciliumcli_archive }}"
+ciliumcli_checksum_extension: .sha256sum

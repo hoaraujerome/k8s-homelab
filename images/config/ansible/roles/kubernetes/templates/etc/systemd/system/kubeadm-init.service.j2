@@ -5,6 +5,8 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
+User=root
+Environment="HOME=/root"
 ExecStart="/{{ kubernetes_kubeadm_init_script_path }}"
 RemainAfterExit=true
 

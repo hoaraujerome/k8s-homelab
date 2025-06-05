@@ -7,6 +7,7 @@
     ansible_python_interpreter: /usr/bin/python3
 
   tasks:
+    # Uncomment for smoke test
     # - name: SSH connection test
     #   ansible.builtin.include_role:
     #     name: display_time
@@ -19,6 +20,9 @@
     - name: Set up AWS CLI
       ansible.builtin.include_role:
         name: awscli
+    - name: Set up Cilium CLI
+      ansible.builtin.include_role:
+        name: ciliumcli
     - name: Set up Kubernetes
       ansible.builtin.include_role:
         name: kubernetes

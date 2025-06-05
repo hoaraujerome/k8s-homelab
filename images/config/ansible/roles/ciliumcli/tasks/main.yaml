@@ -1,0 +1,39 @@
+---
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name: unzip
+    update_cache: true
+    state: present
+
+- name: Download cilium CLI archive
+  ansible.builtin.get_url:
+    url: "{{ ciliumcli_base_url }}{{ ciliumcli_version }}/{{ ciliumcli_archive }}"
+    dest: "{{ ciliumcli_archive_path }}"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Download cilium CLI archive checksum file
+  ansible.builtin.get_url:
+    url: "{{ ciliumcli_base_url }}{{ ciliumcli_version }}/{{ ciliumcli_archive }}{{ ciliumcli_checksum_extension }}"
+    dest: "{{ ciliumcli_archive_path }}{{ ciliumcli_checksum_extension }}"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Verify cilium CLI archive
+  ansible.builtin.command: sha256sum --check {{ ciliumcli_archive }}{{ ciliumcli_checksum_extension }}
+  args:
+    chdir: "{{ ciliumcli_tmp_directory }}"
+  changed_when: false
+
+- name: Unzip cilium CLI archive
+  ansible.builtin.unarchive:
+    src: "{{ ciliumcli_archive_path }}"
+    dest: /usr/local/bin
+    remote_src: true
+
+- name: Remove temporary files
+  ansible.builtin.file:
+    path: /tmp/cilium*
+    state: absent
