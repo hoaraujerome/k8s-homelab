@@ -3,6 +3,9 @@
 set -euo pipefail
 
 METADATA_URL="http://169.254.169.254/latest"
+SSM_CONTROL_PLANE_PRIVATE_IP_PARAMETER="/k8s-homelab/control-plane-private-ip"
+SSM_JOIN_COMMAND_PARAMETER="/k8s-homelab/worker-node-join-command"
+CONTROL_PLANE_HOSTNAME="{{ kubernetes_control_plane_host_name }}"
 
 # Fetch instance role from EC2 metadata
 echo "[*] Fetching EC2 instance role tag..."
@@ -19,36 +22,81 @@ echo "[*] EC2 instance role: ${ROLE}"
 if [[ "${ROLE}" == "k8s-control-plane" ]]; then
   echo "Checking control plane initialization..."
   if [ ! -f /etc/kubernetes/admin.conf ]; then
-    echo "[+] Running kubeadm init..."
-    kubeadm init --config="/{{ kubernetes_kubeadm_config_path }}" \
-      --upload-certs \
-      --node-name="{{ kubernetes_control_plane_host_name }}" |
-      tee /root/kubeadm-init.out
-
-    echo "[+] Install Cilium..."
-    cilium install --version 1.17.4 --kubeconfig /etc/kubernetes/admin.conf
-
-    echo "[+] Save join command to SSM..."
-    WORKER_NODE_JOIN_COMMAND=$(kubeadm token create --ttl 0 --description "Auto-scaled nodes" --print-join-command)
-    aws ssm put-parameter \
-      --name "/k8s-homelab/worker-node-join-command" \
-      --value "${WORKER_NODE_JOIN_COMMAND}" \
-      --type "SecureString" \
-      --overwrite
-
     echo "[+] Save control plane private IP to SSM..."
     CONTROL_PLANE_PRIVATE_IP=$(
       curl -s -H "X-aws-ec2-metadata-token: ${TOKEN}" \
         "${METADATA_URL}/meta-data/local-ipv4"
     )
     aws ssm put-parameter \
-      --name "/k8s-homelab/control-plane-ip" \
+      --name "${SSM_CONTROL_PLANE_PRIVATE_IP_PARAMETER}" \
       --value "${CONTROL_PLANE_PRIVATE_IP}" \
       --type "String" \
       --overwrite
+
+    echo "[+] Updating /etc/hosts..."
+    echo "${CONTROL_PLANE_PRIVATE_IP} ${CONTROL_PLANE_HOSTNAME}" >>/etc/hosts
+
+    echo "[+] Running kubeadm init..."
+    kubeadm init --config="/{{ kubernetes_kubeadm_config_path }}" \
+      --upload-certs \
+      --node-name="{{ kubernetes_control_plane_host_name }}" |
+      tee /root/kubeadm-init.out
+
+    # echo "[+] Install Cilium..."
+    # clusterPoolIPv4PodCIDRList should NOT overlap VPC CIDR (default value 10.0.0.0/8)
+    cilium install \
+      --version 1.17.4 \
+      --set ipam.operator.clusterPoolIPv4PodCIDRList=10.244.0.0/16 \
+      --kubeconfig /etc/kubernetes/admin.conf
+
+    echo "[+] Restarting containerd to read Cilium config..."
+    systemctl restart containerd
+
+    echo "[+] Save join command to SSM..."
+    WORKER_NODE_JOIN_COMMAND=$(kubeadm token create --ttl 0 --description "Auto-scaled nodes" --print-join-command)
+    aws ssm put-parameter \
+      --name "${SSM_JOIN_COMMAND_PARAMETER}" \
+      --value "${WORKER_NODE_JOIN_COMMAND}" \
+      --type "SecureString" \
+      --overwrite
+
   else
     echo "[~] control plane already initialized, skipping."
   fi
 else
-  echo "[!] Skipping Kubernetes init: instance role is not 'k8s-control-plane'."
+  if [ ! -f /etc/kubernetes/kubelet.conf ]; then
+    # Wait to ensure control plane has been initialized.
+    # Can do better than a sleep in the future
+    echo "[*] Waiting 2mins for control plane to initialize..."
+    sleep 120
+
+    # Get control plane IP from SSM
+    echo "[*] Fetching control plane private IP from SSM..."
+    CONTROL_PLANE_PRIVATE_IP=$(aws ssm get-parameter \
+      --name "${SSM_CONTROL_PLANE_PRIVATE_IP_PARAMETER}" \
+      --query "Parameter.Value" \
+      --output text)
+
+    # Add entry to /etc/hosts
+    echo "[*] Adding control plane IP to /etc/hosts..."
+    echo "${CONTROL_PLANE_PRIVATE_IP} ${CONTROL_PLANE_HOSTNAME}" >>/etc/hosts
+
+    echo "[*] Fetching join command from SSM..."
+    WORKER_NODE_JOIN_COMMAND=$(
+      aws ssm get-parameter \
+        --name "${SSM_JOIN_COMMAND_PARAMETER}" \
+        --with-decryption \
+        --query "Parameter.Value" \
+        --output text
+    )
+
+    echo "[+] Running kubeadm join..."
+    eval "${WORKER_NODE_JOIN_COMMAND}" | tee /root/kubeadm-join.out
+
+    echo "[+] Restarting containerd to read Cilium config..."
+    systemctl restart containerd
+
+  else
+    echo "[~] worker node already initialized, skipping."
+  fi
 fi

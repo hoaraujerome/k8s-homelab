@@ -41,14 +41,6 @@
 
 - name: Configure cloud-init
   block:
-    - name: Create update-hosts script
-      ansible.builtin.template:
-        src: "{{ kubernetes_update_hosts_script_path }}.j2"
-        dest: "/{{ kubernetes_update_hosts_script_path }}"
-        owner: root
-        group: root
-        mode: "0740"
-
     - name: Create kubeadm-init script
       ansible.builtin.template:
         src: "{{ kubernetes_kubeadm_init_script_path }}.j2"
@@ -66,8 +58,8 @@
         mode: "0640"
 
     - name: Create cloud-init k8s config
-      ansible.builtin.template:
-        src: "{{ kubernetes_cloud_init_k8s_config_path }}.j2"
+      ansible.builtin.copy:
+        src: "{{ kubernetes_cloud_init_k8s_config_path }}"
         dest: "/{{ kubernetes_cloud_init_k8s_config_path }}"
         owner: root
         group: root
