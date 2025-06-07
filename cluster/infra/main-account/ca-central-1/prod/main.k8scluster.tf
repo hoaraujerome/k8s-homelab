@@ -107,6 +107,14 @@ module "k8s-cluster-ec2-worker-node-security-group-rules" {
       ip_protocol                  = local.tcp_protocol
       referenced_security_group_id = module.ec2-instance-connect-endpoint-security-groups.security_group_id[local.ec2_instance_connect_endpoint_component]
     }
+    "kubelet-inbound-traffic" = {
+      description                  = "Allows inbound Kubelet traffic from the resources associated with the endpoint security group"
+      direction                    = "inbound"
+      from_port                    = "10250"
+      to_port                      = "10250"
+      ip_protocol                  = local.tcp_protocol
+      referenced_security_group_id = module.ec2-instance-connect-endpoint-security-groups.security_group_id[local.ec2_instance_connect_endpoint_component]
+    }
     "http-outbound-traffic" = {
       description = "Allow HTTP outbound traffic"
       direction   = "outbound"
@@ -148,15 +156,15 @@ module "k8s-cluster-ec2-worker-node-instance-profile" {
   ]
 }
 
-module "k8s-cluster-ec2-worker-node-1" {
-  source = "../../../modules/compute-ec2"
-
-  subnet_id            = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.k8s_cluster_subnet_name}"]
-  security_group_ids   = [module.k8s-cluster-security-groups.security_group_id[local.k8s_worker_node_component]]
-  key_pair_name        = module.k8s-cluster-ssh-public-key.key_pair_name
-  iam_instance_profile = module.k8s-cluster-ec2-worker-node-instance-profile.name
-  tags = {
-    Name = "${local.tag_prefix}${local.k8s_worker_node_component}"
-    Role = local.k8s_worker_node_component
-  }
-}
+# module "k8s-cluster-ec2-worker-node-1" {
+#   source = "../../../modules/compute-ec2"
+# 
+#   subnet_id            = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.k8s_cluster_subnet_name}"]
+#   security_group_ids   = [module.k8s-cluster-security-groups.security_group_id[local.k8s_worker_node_component]]
+#   key_pair_name        = module.k8s-cluster-ssh-public-key.key_pair_name
+#   iam_instance_profile = module.k8s-cluster-ec2-worker-node-instance-profile.name
+#   tags = {
+#     Name = "${local.tag_prefix}${local.k8s_worker_node_component}"
+#     Role = local.k8s_worker_node_component
+#   }
+# }
