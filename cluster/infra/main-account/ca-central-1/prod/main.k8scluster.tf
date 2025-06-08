@@ -3,6 +3,7 @@ locals {
   http_port      = 80
   https_port     = 443
   k8s_api_port   = 6443
+  kubelet_port   = 10250
 }
 
 module "k8s-cluster-ssh-public-key" {
@@ -36,6 +37,14 @@ module "k8s-cluster-ec2-control-plane-security-group-rules" {
       ip_protocol                  = local.tcp_protocol
       referenced_security_group_id = module.ec2-instance-connect-endpoint-security-groups.security_group_id[local.ec2_instance_connect_endpoint_component]
     }
+    "k8s-api-inbound-traffic" = {
+      description                  = "Allow K8S API inbound traffic from worker nodes"
+      direction                    = "inbound"
+      from_port                    = local.k8s_api_port
+      to_port                      = local.k8s_api_port
+      ip_protocol                  = local.tcp_protocol
+      referenced_security_group_id = module.k8s-cluster-security-groups.security_group_id[local.k8s_worker_node_component]
+    }
     "http-outbound-traffic" = {
       description = "Allow HTTP outbound traffic"
       direction   = "outbound"
@@ -52,11 +61,11 @@ module "k8s-cluster-ec2-control-plane-security-group-rules" {
       ip_protocol = local.tcp_protocol
       cidr_ipv4   = local.anywhere_ip_v4
     }
-    "k8s-api-inbound-traffic" = {
-      description                  = "Allow K8S API inbound traffic from worker nodes"
-      direction                    = "inbound"
-      from_port                    = local.k8s_api_port
-      to_port                      = local.k8s_api_port
+    "kubelet-outbound-traffic" = {
+      description                  = "Allows outbound Kubelet traffic from the resources associated with the endpoint security group"
+      direction                    = "outbound"
+      from_port                    = local.kubelet_port
+      to_port                      = local.kubelet_port
       ip_protocol                  = local.tcp_protocol
       referenced_security_group_id = module.k8s-cluster-security-groups.security_group_id[local.k8s_worker_node_component]
     }
@@ -110,10 +119,10 @@ module "k8s-cluster-ec2-worker-node-security-group-rules" {
     "kubelet-inbound-traffic" = {
       description                  = "Allows inbound Kubelet traffic from the resources associated with the endpoint security group"
       direction                    = "inbound"
-      from_port                    = "10250"
-      to_port                      = "10250"
+      from_port                    = local.kubelet_port
+      to_port                      = local.kubelet_port
       ip_protocol                  = local.tcp_protocol
-      referenced_security_group_id = module.ec2-instance-connect-endpoint-security-groups.security_group_id[local.ec2_instance_connect_endpoint_component]
+      referenced_security_group_id = module.k8s-cluster-security-groups.security_group_id[local.k8s_control_plane_component]
     }
     "http-outbound-traffic" = {
       description = "Allow HTTP outbound traffic"
@@ -156,15 +165,15 @@ module "k8s-cluster-ec2-worker-node-instance-profile" {
   ]
 }
 
-# module "k8s-cluster-ec2-worker-node-1" {
-#   source = "../../../modules/compute-ec2"
-# 
-#   subnet_id            = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.k8s_cluster_subnet_name}"]
-#   security_group_ids   = [module.k8s-cluster-security-groups.security_group_id[local.k8s_worker_node_component]]
-#   key_pair_name        = module.k8s-cluster-ssh-public-key.key_pair_name
-#   iam_instance_profile = module.k8s-cluster-ec2-worker-node-instance-profile.name
-#   tags = {
-#     Name = "${local.tag_prefix}${local.k8s_worker_node_component}"
-#     Role = local.k8s_worker_node_component
-#   }
-# }
+module "k8s-cluster-ec2-worker-node-1" {
+  source = "../../../modules/compute-ec2"
+
+  subnet_id            = module.vpc.subnet_ids_by_name["${local.tag_prefix}${local.k8s_cluster_subnet_name}"]
+  security_group_ids   = [module.k8s-cluster-security-groups.security_group_id[local.k8s_worker_node_component]]
+  key_pair_name        = module.k8s-cluster-ssh-public-key.key_pair_name
+  iam_instance_profile = module.k8s-cluster-ec2-worker-node-instance-profile.name
+  tags = {
+    Name = "${local.tag_prefix}${local.k8s_worker_node_component}"
+    Role = local.k8s_worker_node_component
+  }
+}
