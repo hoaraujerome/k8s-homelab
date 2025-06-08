@@ -36,14 +36,13 @@ test_modules() {
 
   for dir in "${CHILD_MODULES_DIRS[@]}"; do
     log_message "... module: ${dir}"
-    # TODO delete
-    if [[ "${dir}" == *compute-ec2* ]]; then
-      pushd "${dir}"
-      terraform init -backend=false
-      terraform validate
-      terraform test
-      popd
-    fi
+    # if [[ "${dir}" == *compute-ec2* ]]; then
+    pushd "${dir}"
+    terraform init -backend=false
+    terraform validate
+    terraform test
+    popd
+    # fi
   done
 }
 
