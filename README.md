@@ -10,6 +10,12 @@ While my current job operates 100% in **Azure**, I deliberately chose **AWS** fo
 
 I believe the best way to learn is to **get your hands dirty** — and this repo is a reflection of that mindset: learning by building, breaking, and improving.
 
+## Badges
+
+![Status](https://img.shields.io/badge/status-Phase%201%20complete-blueviolet)
+[![Powered by LazyVim](https://img.shields.io/badge/Powered_by-LazyVim-%2307a6c3?style=flat&logo=vim&logoColor=white)](https://lazyvim.org/)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
 ## Developer Setup
 
 ### Requirements
