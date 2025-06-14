@@ -22,12 +22,15 @@ I believe the best way to learn is to **get your hands dirty** — and this repo
 
 ![K8S_Infra_Deployment_Diagram](https://github.com/user-attachments/assets/af034cd3-bf3e-4ac1-901e-5176c3f7b273)
 
+## Contributing
+
+This project is a personal learning endeavor, and contributions are not being accepted at this time.
 
 ## Developer Setup
 
 ### Requirements
 
-- TODO: devbox
+- [devbox](https://www.jetify.com/devbox)
 
 ### Steps
 
@@ -54,3 +57,23 @@ I believe the best way to learn is to **get your hands dirty** — and this repo
    export AWS_PROFILE="k8s_homelab"
    ssh -i ~/.ssh/id_rsa_k8s_homelab ubuntu@i-07eb24daa48842f91 -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id i-07eb24daa48842f91'
    ```
+
+## Authors and Acknowledgment
+
+- **Hoarau Jerome** - [GitHub](https://github.com/hoaraujerome)
+
+## License
+
+This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. For more details, see the LICENSE file or visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
+
+## Project Status
+
+✅ **Phase 1 Completed**
+
+The Kubernetes cluster is successfully deployed on AWS using `kubeadm` and self-managed EC2 instances. This phase included:
+
+- Infrastructure as Code setup for 1 control plane node and 1 worker node
+- End-to-end automation: AMI building (Packer + Ansible), infrastructure provisioning (Terraform), and cluster bootstrapping
+- Secure access to the Kubernetes API server from the local machine
+
+🚧 **Phase 2 is planned**, but its scope is yet to be defined.
