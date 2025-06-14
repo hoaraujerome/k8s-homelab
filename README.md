@@ -16,6 +16,13 @@ I believe the best way to learn is to **get your hands dirty** — and this repo
 [![Powered by LazyVim](https://img.shields.io/badge/Powered_by-LazyVim-%2307a6c3?style=flat&logo=vim&logoColor=white)](https://lazyvim.org/)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
+## Visuals
+
+### Infrastructure
+
+![K8S_Infra_Deployment_Diagram](https://github.com/user-attachments/assets/af034cd3-bf3e-4ac1-901e-5176c3f7b273)
+
+
 ## Developer Setup
 
 ### Requirements
