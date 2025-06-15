@@ -1,4 +1,4 @@
-# Cloud Homelab: Kubernetes Cluster (with kubeadm) on AWS 
+# Cloud Homelab: Kubernetes Cluster (with kubeadm) on AWS
 
 ## Description
 
@@ -45,12 +45,13 @@ To streamline development and ensure consistent tooling across environments, I u
    ```sh
    devbox shell
    ```
-      
+
 3. Setup foundations:
+
    ```sh
    make foundations
    ```
-   
+
 ```mermaid
 graph TD
     root[Setup Foundations]
@@ -72,6 +73,7 @@ graph TD
 ```
 
 4. Build the Kubeadm Base AMI Provision:
+
    ```sh
    make images-config-build
    # skipping tests flag available: SKIP_TESTS="1" make images-config-build
@@ -100,7 +102,6 @@ graph TD;
     classDef highlight fill:#facc15,stroke:#000,stroke-width:2,color:#000;
     %% Yellow fill, black border/text – good for both light & dark themes
 ```
-
 
 ## Contributing
 
@@ -142,7 +143,7 @@ This project is a personal learning endeavor, and contributions are not being ac
 
 ## Usage
 
-* SSH to an EC2 instance
+- SSH to an EC2 instance
 
    ```sh
    AWS_PROFILE="k8s_homelab" aws ec2-instance-connect ssh --instance-id i-07eb24daa48842f91 --os-user ubuntu --connection-type eice
@@ -151,21 +152,53 @@ This project is a personal learning endeavor, and contributions are not being ac
    ssh -i ~/.ssh/id_rsa_k8s_homelab ubuntu@i-07eb24daa48842f91 -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id i-07eb24daa48842f91'
    ```
 
-* Smoke tests
+- Smoke tests
 
    ```sh
-   root@ip-10-0-1-114:~# export KUBECONFIG=/etc/kubernetes/admin.conf
-   root@ip-10-0-1-114:~# cilium status --wait
+   root@ip-10-0-1-114:~ export KUBECONFIG=/etc/kubernetes/admin.conf
+
+   root@ip-10-0-1-114:~ cilium status --wait
+          /¯¯\
+    /¯¯\__/¯¯\    Cilium:             OK
+    \__/¯¯\__/    Operator:           OK
+    /¯¯\__/¯¯\    Envoy DaemonSet:    OK
+    \__/¯¯\__/    Hubble Relay:       disabled
+       \__/       ClusterMesh:        disabled
+   
+   DaemonSet              cilium                   Desired: 2, Ready: 2/2, Available: 2/2
+   DaemonSet              cilium-envoy             Desired: 2, Ready: 2/2, Available: 2/2
+   Deployment             cilium-operator          Desired: 1, Ready: 1/1, Available: 1/1
+   Containers:            cilium                   Running: 2
+                          cilium-envoy             Running: 2
+                          cilium-operator          Running: 1
+                          clustermesh-apiserver
+                          hubble-relay
+   Cluster Pods:          2/2 managed by Cilium
+   Helm chart version:    1.17.4
+   Image versions         cilium             quay.io/cilium/cilium:v1.17.4@sha256:24a73fe795351cf3279ac8e84918633000b52a9654ff73a6b0d7223bcff4a67a: 2
+                          cilium-envoy       quay.io/cilium/cilium-envoy:v1.32.6-1746661844-0f602c28cb2aa57b29078195049fb257d5b5246c@sha256:a04218c6879007d60d96339a441c448565b6f86650358652da27582e0efbf182: 2
+                          cilium-operator    quay.io/cilium/operator-generic:v1.17.4@sha256:a3906412f477b09904f46aac1bed28eb522bef7899ed7dd81c15f78b7aa1b9b5: 1
+
+   root@ip-10-0-1-114:~ kubectl get nodes -o wide
+   NAME            STATUS   ROLES           AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION   CONTAINER-RUNTIME
+   ip-10-0-1-173   Ready    <none>          7m15s   v1.32.4   10.0.1.173    <none>        Ubuntu 24.04.2 LTS   6.8.0-1029-aws   containerd://1.7.27
+   k8scp           Ready    control-plane   7m49s   v1.32.4   10.0.1.114    <none>        Ubuntu 24.04.2 LTS   6.8.0-1029-aws   containerd://1.7.27
+
+   root@ip-10-0-1-114:~ kubectl create deployment nginx --image=nginx
+   deployment.apps/nginx created
+
+   root@ip-10-0-1-114:~ kubectl get pods -o wide
+   NAME                     READY   STATUS    RESTARTS   AGE   IP             NODE            NOMINATED NODE   READINESS GATES
+   nginx-5869d7778c-2wphd   1/1     Running   0          33s   10.244.1.146   ip-10-0-1-173   <none>           <none>
    ```
   
-
 ## Authors and Acknowledgment
 
 - **Hoarau Jerome** - [GitHub](https://github.com/hoaraujerome)
 
 ## License
 
-This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. For more details, see the LICENSE file or visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
+This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. For more details, see the LICENSE file or visit <http://creativecommons.org/licenses/by-nc-sa/4.0/>.
 
 ## Project Status
 
