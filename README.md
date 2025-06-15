@@ -22,7 +22,7 @@ To streamline development and ensure consistent tooling across environments, I u
 
 ### Infrastructure
 
-![K8S_Infra_Deployment_Diagram](https://github.com/user-attachments/assets/af034cd3-bf3e-4ac1-901e-5176c3f7b273)
+![K8S_Infra_Deployment_Diagram](https://github.com/user-attachments/assets/85cb5e2c-b3d0-4d86-8106-2e6f716f7c8e)
 
 ## Installation
 
