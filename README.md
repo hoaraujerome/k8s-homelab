@@ -151,7 +151,13 @@ This project is a personal learning endeavor, and contributions are not being ac
    ssh -i ~/.ssh/id_rsa_k8s_homelab ubuntu@i-07eb24daa48842f91 -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id i-07eb24daa48842f91'
    ```
 
-TODO: complete with "smoke tests"
+* Smoke tests
+
+   ```sh
+   root@ip-10-0-1-114:~# export KUBECONFIG=/etc/kubernetes/admin.conf
+   root@ip-10-0-1-114:~# cilium status --wait
+   ```
+  
 
 ## Authors and Acknowledgment
 
